@@ -9,7 +9,7 @@ Built with **FastAPI + Jinja2 + SQLite + OpenCV**, styled with Tailwind CSS.
 ---
 
 ## Screenshot
-<img width="1509" height="857" alt="Screenshot 2026-10-21 at 3 33 27 AM" src="https://github.com/user-attachments/assets/25632844-ac49-4e1b-b70c-3b78711b73b1" />
+<img width="1509" height="857" alt="Screenshot 2026-10-21 at 3 38 31 AM" src="https://github.com/user-attachments/assets/96d73b4e-ba08-4f01-b6e6-d9096b989c1d" />
 
 ---
 
