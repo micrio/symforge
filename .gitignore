@@ -1,0 +1,22 @@
+# Local Database Ledger
+metadata.db
+
+# Environment Modules
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Tailwind toolchain (dev only)
+node_modules/
+
+# Content Caches
+app/static/uploads/*
+app/static/exports/*
+!app/static/uploads/.gitkeep
+!app/static/exports/.gitkeep
+
+# Build artifacts
+build/
+dist/
+dmg_stage/
