@@ -6,6 +6,11 @@ Built with **FastAPI + Jinja2 + SQLite + OpenCV**, styled with Tailwind CSS.
 
 ---
 
+## Screenshot
+<img width="1509" height="857" alt="Screenshot 2026-10-21 at 3 33 27 AM" src="https://github.com/user-attachments/assets/25632844-ac49-4e1b-b70c-3b78711b73b1" />
+
+--
+
 ## Features
 
 - **Upload** multiple images at once (UUID filenames, originals never overwritten)
