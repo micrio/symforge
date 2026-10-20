@@ -1,6 +1,8 @@
 # SymForge
 
-Local web app for turning scanned **symbol sheets** into labeled image crops. Upload a sheet, auto-detect symbols with OpenCV, fix/group/rename the boxes in the browser, then export one PNG/JPG per symbol into label-named folders.
+**Turn one symbol sheet into hundreds of labeled AI-training crops — fast.**
+
+SymForge is a local web app that auto-detects individual symbols inside a single scanned sheet, lets you fix and label them in the browser, then exports one PNG/JPG per symbol into label-named folders. No more manually cropping images one by one — build training datasets in minutes instead of hours.
 
 Built with **FastAPI + Jinja2 + SQLite + OpenCV**, styled with Tailwind CSS.
 
@@ -9,12 +11,22 @@ Built with **FastAPI + Jinja2 + SQLite + OpenCV**, styled with Tailwind CSS.
 ## Screenshot
 <img width="1509" height="857" alt="Screenshot 2026-10-21 at 3 33 27 AM" src="https://github.com/user-attachments/assets/25632844-ac49-4e1b-b70c-3b78711b73b1" />
 
---
+---
+
+## Why SymForge?
+
+- **One sheet in, many training images out** — detect every symbol on a page automatically instead of cropping each one by hand.
+- **Faster dataset creation** — label once, export hundreds of clean, consistently sized crops in a single run.
+- **Built for messy scans** — adjust detection sensitivity, snap manual boxes to the ink, and merge split shapes like the dot and stem of `i`.
+- **Organized exports** — crops land in per-label folders, ready to drop into an AI training pipeline.
+
+---
 
 ## Features
 
 - **Upload** multiple images at once (UUID filenames, originals never overwritten)
 - **Auto-detect** symbol boxes via OpenCV contour detection (adjustable minimum area + padding)
+- **Bulk dataset creation** — slice one sheet into many individual training images in one pass
 - **Re-analyze** an image at any time (wipes previous boxes for that image)
 - **Manual boxes** — draw a rectangle; it snaps to the ink underneath
 - **Combine** boxes into one symbol (e.g. dot + stem of `i`)
