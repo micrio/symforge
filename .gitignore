@@ -20,3 +20,6 @@ app/static/exports/*
 build/
 dist/
 dmg_stage/
+
+# macOS metadata
+.DS_Store
