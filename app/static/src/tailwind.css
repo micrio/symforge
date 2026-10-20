@@ -1,0 +1,34 @@
+/* Tailwind v4 input.
+   Build:  npm run build:css
+   Watch:  npm run watch:css
+   Output: app/static/tailwind.css (bundled; no CDN, works offline)
+
+   Preflight is intentionally NOT imported so the existing hand-written CSS
+   keeps its look while we migrate piece by piece. Utilities still work. */
+
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "../../templates/**/*.html";
+
+/* dark mode is driven by [data-theme="dark"] on <html> */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* expose the app's existing CSS variables as Tailwind color tokens
+   e.g. bg-panel, text-ink, border-line, bg-primary */
+@theme {
+    --color-bg: var(--bg);
+    --color-panel: var(--panel);
+    --color-panel2: var(--panel-2);
+    --color-line: var(--border);
+    --color-input: var(--input-bg);
+    --color-ink: var(--text);
+    --color-muted: var(--muted);
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-secondary: var(--secondary);
+    --color-accent: var(--accent-bg);
+    --color-danger: var(--danger);
+    --color-on-primary: var(--on-primary);
+}

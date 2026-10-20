@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SymForge</title>
+    <style>
+        :root {
+            --bg: #F4FAFA; --panel: #FFFFFF; --panel-2: #E6F4F6; --input-bg: #FFFFFF;
+            --border: #D6E6E8; --input-border: #BCD8DC; --text: #14262B; --muted: #5C7A7E;
+            --primary: #006B76; --primary-hover: #008B99; --on-primary: #FFFFFF; --secondary: #008B99;
+            --accent-bg: #E6F4F6; --stage-bg: #EEF6F7;
+            --checked: #006B76; --checked-bg: rgba(0,107,118,0.15);
+            --highlight: #E07B00; --highlight-bg: rgba(224,123,0,0.18); --highlight-ring: rgba(224,123,0,0.30);
+            --danger: #C0392B; --danger-bg: #FBE3E1;
+            --box-num: #3A5459; --box-num-halo: #FFFFFF;
+            --box-in: #16A34A; --box-in-bg: rgba(22,163,74,0.12);
+            --box-out: #DC2626; --box-out-bg: rgba(220,38,38,0.10);
+            --box-group: #2563EB; --box-group-bg: rgba(37,99,235,0.10);
+            --member-outline: rgba(0,139,153,0.55); --member-bg: rgba(0,139,153,0.05);
+            --marquee-bg: rgba(0,107,118,0.12); --shadow: rgba(0,0,0,0.12);
+        }
+        [data-theme="dark"] {
+            --bg: #0B1618; --panel: #122D31; --panel-2: #173A40; --input-bg: #0F2226;
+            --border: #1F464D; --input-border: #2A5560; --text: #E6F4F6; --muted: #8FB3B7;
+            --primary: #4CD2E0; --primary-hover: #2AA1AF; --on-primary: #04262B; --secondary: #2AA1AF;
+            --accent-bg: #173A40; --stage-bg: #08171A;
+            --checked: #4CD2E0; --checked-bg: rgba(76,210,224,0.18);
+            --highlight: #F2B04A; --highlight-bg: rgba(242,176,74,0.20); --highlight-ring: rgba(242,176,74,0.30);
+            --danger: #F87171; --danger-bg: #3A1E1E;
+            --box-num: #E6F4F6; --box-num-halo: #0B1618;
+            --box-in: #4ADE80; --box-in-bg: rgba(74,222,128,0.16);
+            --box-out: #F87171; --box-out-bg: rgba(248,113,113,0.14);
+            --box-group: #60A5FA; --box-group-bg: rgba(96,165,250,0.14);
+            --member-outline: rgba(42,161,175,0.60); --member-bg: rgba(42,161,175,0.06);
+            --marquee-bg: rgba(76,210,224,0.15); --shadow: rgba(0,0,0,0.45);
+        }
+        html, body { height: 100%; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); overflow: hidden; }
+        hr { border-top-color: var(--border) !important; }
+        .app-shell { display: flex; margin: 0; align-items: stretch; height: 100vh; overflow: hidden; box-sizing: border-box; }
+        .sidebar { width: 250px; flex: 0 0 auto; height: 100%; overflow: hidden; background: var(--panel); border-right: 1px solid var(--border); padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; transition: width .2s ease, padding .2s ease; }
+        .sidebar.collapsed { width: 64px; padding: 16px 8px; }
+        .sidebar-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .sidebar-title { font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; flex: 1; }
+        .sidebar-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar-body input, .sidebar-body select { max-width: 100%; }
+        .images-section { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .img-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-theme { margin-top: 12px; flex: 0 0 auto; width: 100%; justify-content: flex-start; gap: 10px; font-weight: 600; font-size: 14px; }
+        .sidebar-toggle { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+        .sidebar-toggle:hover { background: var(--accent-bg); }
+        .sidebar-toggle svg { display: block; transition: transform .2s ease; }
+        .sidebar.collapsed .sidebar-title { display: none; }
+        .sidebar.collapsed .sidebar-head { justify-content: center; }
+        .sidebar.collapsed .sidebar-theme { display: none; }
+        .sidebar.collapsed .sidebar-body { display: none; }
+        .sidebar.collapsed .sidebar-toggle svg { transform: rotate(180deg); }
+        .main-panel { flex: 1; min-width: 0; height: 100%; overflow-y: auto; overflow-x: clip; background: transparent; padding: 24px; margin: 0; box-sizing: border-box; }
+        .main-panel > h3 { margin: 0 0 16px; }
+        .right-panel { flex: 0 1 260px; width: auto; min-width: 190px; max-width: 280px; box-sizing: border-box; background: var(--panel); border-left: 1px solid var(--border); padding: 16px; height: 100%; overflow-y: auto; overflow-x: clip; margin: 0; }
+        .btn { background: var(--primary); color: var(--on-primary); border: none; height: 38px; padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--secondary); color: var(--on-primary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-success:hover { background: var(--primary); }
+        .input-text { padding: 8px; border: 1px solid var(--input-border); border-radius: 6px; width: 100%; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; }
+        a { color: var(--primary); text-decoration: none; } a:hover { text-decoration: underline; }
+        .img-list { list-style: none; padding: 0; margin: 0; }
+        .img-list li { margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+        .img-list a { display: block; padding: 8px 10px; border-radius: 6px; font-size: 14px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .img-list a.active { background: var(--accent-bg); font-weight: 600; }
+        .img-list a:hover { background: var(--panel-2); text-decoration: none; }
+        .stage-viewport { display: inline-block; vertical-align: top; max-width: 100%; max-height: 78vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--stage-bg); }
+        .stage { position: relative; display: inline-block; max-width: 100%; }
+        .stage img { display: block; width: 100%; height: auto; }
+        .box { position: absolute; border: 1px solid var(--box-in); background: var(--box-in-bg); box-sizing: border-box; cursor: pointer; transition: border-color .1s, background .1s; z-index: 2; }
+        .box.group-box { border: 2px solid var(--box-group); background: var(--box-group-bg); }
+        .member-outline { position: absolute; border: 1px dashed var(--box-in); background: var(--box-in-bg); box-sizing: border-box; pointer-events: none; z-index: 1; }
+        .member-outline .box-num { left: auto; right: 2px; }
+        .box:hover { border-color: var(--text); }
+        .box:not(.checked) { display: none; }
+        .box.highlight { border: 3px solid var(--highlight); background: var(--highlight-bg); box-shadow: 0 0 0 3px var(--highlight-ring); z-index: 5; }
+        .unit-row.active { background: var(--highlight-bg); border-radius: 6px; outline: 2px solid var(--highlight); }
+        .unit-row.hidden { display: none; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .tab { flex: 1; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .tab.active { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .group-card { border: 1px solid var(--secondary); background: var(--panel-2); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+        .group-card.hidden { display: none; }
+        .group-card.active { outline: 2px solid var(--highlight); }
+        .group-card .group-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .group-card .sid { font-size: 12px; font-weight: 700; color: var(--primary); white-space: normal; overflow-wrap: anywhere; flex: 1; min-width: 0; line-height: 1.3; }
+        .toolbar { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; }
+        .badge { color: var(--primary); font-weight: bold; font-size: 12px; }
+        .muted { color: var(--muted); font-style: italic; }
+        .tips { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+        .tips summary { cursor: pointer; font-weight: 600; user-select: none; }
+        .tips ul { margin: 6px 0 0; padding-left: 20px; line-height: 1.6; }
+        .tips li { margin-bottom: 2px; }
+        select { padding: 8px; border: 1px solid var(--input-border); border-radius: 6px; width: 100%; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
+        .unit-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; min-width: 0; }
+        .unit-row .sid { font-size: 11px; color: var(--muted); min-width: 28px; white-space: nowrap; }
+        .right-panel .input-text { padding: 5px 7px; font-size: 12px; min-width: 0; }
+        .right-panel h3 { font-size: 15px; margin: 0 0 8px; }
+        .right-panel .group-card { padding: 6px 8px; margin-bottom: 8px; }
+        .right-panel .count { font-size: 12px; margin-bottom: 8px; }
+        .right-panel .tab { padding: 6px; font-size: 12px; }
+        .zoom-controls { display: flex; align-items: center; gap: 4px; }
+        .zoom-btn { height: 38px; min-width: 38px; padding: 0 10px; font-size: 14px; box-sizing: border-box; }
+        .zoom-level { font-size: 12px; color: var(--muted); min-width: 42px; text-align: center; }
+        .mode-toggle { display: flex; gap: 4px; }
+        .mode-btn { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); height: 38px; padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
+        .mode-btn.active { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+        .stage { cursor: grab; }
+        .stage.panning { cursor: grabbing; }
+        .stage.select-mode { cursor: crosshair; }
+        .count { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+        .count b { color: var(--primary); }
+        .del-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px 7px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+        .del-btn svg { display: block; }
+        .del-btn:hover { background: var(--danger-bg); color: var(--danger); }
+        .box-num { position: absolute; top: 1px; left: 2px; font-size: 8px; font-weight: 600; color: var(--box-num); background: transparent; padding: 0; line-height: 1; pointer-events: none; opacity: 0.5; white-space: nowrap; max-width: calc(100% - 4px); overflow: hidden; text-overflow: ellipsis; text-shadow: 0 0 2px var(--box-num-halo), 0 0 2px var(--box-num-halo), 0 0 3px var(--box-num-halo); }
+        #marquee { position: absolute; border: 1px solid var(--primary); background: var(--marquee-bg); display: none; pointer-events: none; z-index: 20; }
+        #group-popup { position: fixed; display: none; flex-direction: column; gap: 6px; min-width: 170px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px; box-shadow: 0 8px 24px var(--shadow); z-index: 1000; }
+        .modal-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); z-index: 2000; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 20px; max-width: 420px; width: 90%; box-shadow: 0 12px 40px var(--shadow); }
+        .modal h3 { margin: 0 0 10px; }
+        .modal p { margin: 0 0 18px; color: var(--muted); line-height: 1.5; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: var(--primary); color: var(--on-primary); padding: 10px 18px; border-radius: 8px; box-shadow: 0 8px 24px var(--shadow); font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 3000; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .rename-row { display: flex; align-items: center; gap: 6px; }
+        .rename-row .input-text { flex: 1; width: auto; }
+        .rename-ext { color: var(--muted); font-size: 13px; white-space: nowrap; }
+        .mini-icon-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 4px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+        .mini-icon-btn:hover { background: var(--panel-2); color: var(--primary); }
+        .move-group-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow: auto; margin-bottom: 16px; }
+        .move-group-option { text-align: left; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; width: 100%; }
+        .move-group-option:hover { border-color: var(--primary); }
+        .move-group-option.selected { border-color: var(--box-group); background: var(--box-group-bg); font-weight: 700; }
+        .move-group-option .idx { display: block; color: var(--muted); font-size: 11px; font-weight: 400; margin-top: 2px; overflow-wrap: anywhere; }
+        #group-popup .btn { padding: 6px 10px; font-size: 13px; width: 100%; text-align: center; }
+        .topbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+        .topbar h2 { margin: 0; }
+        .theme-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+        .theme-btn:hover { background: var(--panel-2); }
+        .theme-btn svg { display: block; }
+        .theme-btn .icon-sun { display: none; }
+        [data-theme="dark"] .theme-btn .icon-moon { display: none; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: block; }
+        /* dark theme colors come from the [data-theme="dark"] variable block above */
+    </style>
+    <link rel="stylesheet" href="/static/tailwind.css">
+    <script>
+        (function () {
+            var saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+            else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+                document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
+</head>
+<body>
+    <div class="app-shell">
+        <div class="sidebar">
+            <div class="sidebar-head">
+                <span class="sidebar-title">SymForge</span>
+                <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar" aria-label="Toggle sidebar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="sidebar-body">
+            <h3>Upload Images</h3>
+            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="files" accept="image/*" multiple required
+                           onchange="document.getElementById('upload-form').submit();">
+                </div>
+            </form>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
+            <h3>Export Directory</h3>
+            <form action="/settings/pick-export-dir" method="post">
+                {% if active_image %}<input type="hidden" name="image_id" value="{{ active_image.id }}">{% endif %}
+                <div class="form-group">
+                    <input type="text" value="{{ export_dir }}" class="input-text" readonly
+                           placeholder="No folder selected" title="Base folder for exported crops">
+                </div>
+                <button type="submit" class="btn" style="width:100%;">Choose Folder…</button>
+            </form>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
+            {% if active_image and symbols %}
+            <h3>Export Settings</h3>
+            <div class="form-group">
+                <label>Export Format</label>
+                <select name="format" form="export-form">
+                    <option value="png">PNG</option>
+                    <option value="jpg">JPEG</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>File Naming</label>
+                <select name="naming" form="export-form">
+                    <option value="label">Label (a, a-2, …)</option>
+                    <option value="original">Image + ID</option>
+                </select>
+            </div>
+            <div class="count" style="margin-bottom:10px;"><b id="sel-count-2">0</b> selected to export</div>
+            <button type="submit" form="export-form" class="btn btn-success" style="width:100%;">Export Selected</button>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
+            {% endif %}
+            <div class="images-section">
+            <h3>Images</h3>
+            <ul class="img-list">
+                {% for img in images %}
+                <li>
+                    <a href="/review/{{ img.id }}" class="{% if active_image and active_image.id == img.id %}active{% endif %}">
+                        {{ img.filename }}
+                    </a>
+                    <button type="button" class="mini-icon-btn rename-image-btn" data-image-id="{{ img.id }}"
+                            data-filename="{{ img.filename }}" title="Rename image" aria-label="Rename image">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path>
+                        </svg>
+                    </button>
+                    <form action="/delete/{{ img.id }}" method="post"
+                          onsubmit="return confirm('Delete this image and its symbols?');">
+                        <button type="submit" class="del-btn" title="Delete image" aria-label="Delete image">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                <path d="M10 11v6M14 11v6"></path>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+                {% if not images %}
+                <li class="muted" style="font-size:13px;">No images uploaded yet.</li>
+                {% endif %}
+            </ul>
+            </div>
+            </div>
+            <button type="button" id="theme-toggle" class="theme-btn sidebar-theme" title="Toggle theme" aria-label="Toggle theme">
+                <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                </svg>
+                <span>Toggle theme</span>
+            </button>
+        </div>
+
+        <div class="main-panel">
+            {% if active_image %}
+                <h3>Image: {{ active_image.filename }}</h3>
+
+                <div class="toolbar">
+                    <div class="flex items-end gap-4 box-border rounded-lg border border-line bg-panel py-2.5 px-3">
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:4px;">Minimum Area (px)</label>
+                            <input type="number" name="min_area" form="analyze-form" value="150" class="input-text" style="width:90px;">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:4px;">Padding (px)</label>
+                            <input type="number" name="padding" form="analyze-form" value="8" class="input-text" style="width:90px;">
+                        </div>
+                        <form id="analyze-form" action="/analyze/{{ active_image.id }}" method="post" data-has-boxes="{{ '1' if symbols else '0' }}">
+                            <button type="submit" class="btn">Analyze Image</button>
+                        </form>
+                    </div>
+                    <div style="flex-basis:100%; display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;">
+                        <div class="box-border rounded-lg border border-line bg-panel py-2.5 px-3">
+                            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:4px;">Mode</label>
+                            <div class="mode-toggle">
+                                <button type="button" class="mode-btn active" id="mode-pan" data-mode="pan" title="Drag to move the view">Pan</button>
+                                <button type="button" class="mode-btn" id="mode-select" data-mode="select" title="Drag to select boxes for grouping">Select</button>
+                            </div>
+                        </div>
+                        <div class="box-border rounded-lg border border-line bg-panel py-2.5 px-3">
+                            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:4px;">Zoom</label>
+                            <div class="zoom-controls">
+                                <button type="button" class="btn zoom-btn" id="zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+                                <span class="zoom-level" id="zoom-level">100%</span>
+                                <button type="button" class="btn zoom-btn" id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+                                <button type="button" class="btn zoom-btn" id="zoom-reset" title="Reset zoom">Reset</button>
+                            </div>
+                        </div>
+                        <div class="box-border rounded-lg border border-line bg-panel py-2.5 px-3">
+                            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:4px;">History</label>
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" class="btn" id="undo-btn" title="Undo (Ctrl+Z)">Undo</button>
+                                <button type="button" class="btn" id="redo-btn" title="Redo (Ctrl+Shift+Z)">Redo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if not symbols %}
+                    {% if analyzed %}
+                        <p class="muted" style="margin:0 0 14px;">No symbols detected. Lower the minimum area and analyze again.</p>
+                    {% else %}
+                        <p class="muted" style="margin:0 0 14px;">Click <strong>Analyze Image</strong> to auto-detect symbols, then click the boxes to include or exclude.</p>
+                    {% endif %}
+                {% endif %}
+
+                <div class="stage-viewport" id="stage-viewport">
+                <div class="stage" id="stage" data-image-id="{{ active_image.id }}"
+                     data-img-w="{{ img_w }}" data-img-h="{{ img_h }}">
+                    <img src="/uploads/{{ img_filename }}" alt="{{ active_image.filename }}" draggable="false">
+                    <div id="boxes-layer" data-symbols='{{ symbol_order|tojson }}'>
+                    {% for m in member_outlines %}
+                        {% if img_w and img_h %}
+                        <div class="member-outline" data-members="{{ m.sid }}"
+                             style="left: {{ (m.x / img_w * 100) }}%; top: {{ (m.y / img_h * 100) }}%;
+                                    width: {{ (m.w / img_w * 100) }}%; height: {{ (m.h / img_h * 100) }}%;">
+                            <span class="box-num">{{ m.index }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% for box in boxes %}
+                        {% if img_w and img_h %}
+                        <div class="box {% if box.is_checked %}checked{% endif %} {% if box.kind == 'group' %}group-box{% endif %}"
+                             data-unit="{{ box.unit_key }}" data-members="{{ box.members }}"
+                             style="left: {{ (box.x / img_w * 100) }}%; top: {{ (box.y / img_h * 100) }}%;
+                                    width: {{ (box.w / img_w * 100) }}%; height: {{ (box.h / img_h * 100) }}%;">
+                            <span class="box-num">{{ box.index }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                    <div id="marquee"></div>
+                </div>
+                </div>
+                <details class="tips">
+                    <summary>Tips</summary>
+                    <ul>
+                        <li>Click a box on the image to include or exclude it from export.</li>
+                        <li>In <strong>Pan</strong> mode, drag the image to move the view like a PDF.</li>
+                        <li>Switch to <strong>Select</strong> mode, then drag over boxes to <strong>Combine as one symbol</strong>, make a <strong>New Group</strong>, or <strong>Exclude</strong> them.</li>
+                        <li>In <strong>Select</strong> mode, drag over a missed symbol and click <strong>New Symbol</strong> to add it.</li>
+                        <li>Type a label for each selected box/group to set its export folder name.</li>
+                    </ul>
+                </details>
+            {% else %}
+                <p class="muted">Upload an image, or select one from the list to review and analyze it.</p>
+            {% endif %}
+        </div>
+
+        {% if active_image and symbols %}
+        <div class="right-panel">
+            <form id="export-form" action="/export/{{ active_image.id }}" method="post">
+                {% for u in units %}
+                    <input type="checkbox" name="keep_{{ u.key }}" id="keep_{{ u.key }}"
+                           data-unit="{{ u.key }}" {% if u.is_checked %}checked{% endif %} style="display:none;">
+                {% endfor %}
+            </form>
+
+            <h3>Labels</h3>
+            <div class="count"><b id="sel-count">0</b> selected for export</div>
+
+            {% set active_tab = 'single' if single_units else 'grouped' %}
+            <div class="tabs">
+                <button type="button" class="tab {% if active_tab == 'single' %}active{% endif %}"
+                        data-tab="single" onclick="switchTab('single')">Single (<span id="single-count">{{ single_units|selectattr('is_checked')|list|length }}</span>)</button>
+                <button type="button" class="tab {% if active_tab == 'grouped' %}active{% endif %}"
+                        data-tab="grouped" onclick="switchTab('grouped')">Grouped (<span id="group-count">{{ group_units|selectattr('is_checked')|list|length }}</span>)</button>
+            </div>
+
+            <div class="tab-panel {% if active_tab == 'single' %}active{% endif %}" id="tab-single">
+                {% for u in single_units %}
+                <div class="unit-row" data-unit="{{ u.key }}" data-members="{{ u.members|join(',') }}">
+                    <span class="sid">#{{ u.label_indices|join(', #') }}</span>
+                    <input type="text" name="label_{{ u.key }}" form="export-form" value="{{ u.label }}"
+                           data-unit="{{ u.key }}" class="input-text label-input" placeholder="folder e.g. a">
+                    {% if u.is_exported %}<span class="badge">✓</span>{% endif %}
+                    {% if group_units %}
+                    <button type="button" class="mini-icon-btn add-to-group-btn" data-symbol-id="{{ u.id }}"
+                            title="Add to group" aria-label="Add to group">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if not single_units %}<p class="muted" style="font-size:12px;">No single symbols.</p>{% endif %}
+            </div>
+
+            <div class="tab-panel {% if active_tab == 'grouped' %}active{% endif %}" id="tab-grouped">
+                {% for u in group_units %}
+                <div class="group-card" data-unit="{{ u.key }}" data-members="{{ u.members|join(',') }}">
+                    <div class="group-head">
+                        <span class="sid">#{{ u.label_indices|join(', #') }}</span>
+                        {% if u.is_exported %}<span class="badge">✓</span>{% endif %}
+                        <form action="/ungroup/{{ active_image.id }}" method="post" style="margin:0;" onsubmit="return false;">
+                            <input type="hidden" name="group_id" value="{{ u.id }}">
+                            <button type="button" class="del-btn ungroup-btn" data-group-id="{{ u.id }}" title="Split into separate boxes">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M18.84 12.25l1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M5.17 11.75l-1.71 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    <input type="text" name="label_{{ u.key }}" form="export-form" value="{{ u.label }}"
+                           data-unit="{{ u.key }}" class="input-text label-input" placeholder="symbol label">
+                </div>
+                {% endfor %}
+                {% if not group_units %}<p class="muted" style="font-size:12px;">No grouped symbols. Drag on the image and choose "New Group".</p>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="group-popup"></div>
+    <div id="toast" class="toast"></div>
+    <div id="rename-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>Rename image</h3>
+            <form id="rename-image-form" method="post" action="">
+                <input type="hidden" name="next_url" value="">
+                <div class="form-group rename-row">
+                    <input type="text" id="rename-image-input" name="name" class="input-text" required>
+                    <span id="rename-image-ext" class="rename-ext"></span>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" id="rename-image-cancel" style="background:#64748b;">Cancel</button>
+                    <button type="submit" class="btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if active_image %}
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>Analyze image again?</h3>
+            <p>This re-runs detection and removes the current boxes, labels, groups, and the undo/redo history for this image.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn" id="modal-cancel" style="background:#64748b;">Cancel</button>
+                <button type="button" class="btn" id="modal-confirm">Analyze</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if active_image %}
+    <div id="move-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>Add to group</h3>
+            <p>Pick the group this box should join for labeling. It will be highlighted on the image, then confirm.</p>
+            <div class="move-group-list">
+                {% for g in group_units %}
+                <button type="button" class="move-group-option" data-unit="{{ g.key }}" data-group-id="{{ g.id }}">
+                    <span class="lbl">{{ g.label or '(unlabeled)' }}</span>
+                    <span class="idx">#{{ g.label_indices|join(', #') }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn" id="move-cancel" style="background:#64748b;">Cancel</button>
+                <button type="button" class="btn" id="move-confirm" disabled>Add to group</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <script>
+        var stageEl = document.getElementById('stage');
+        var marqueeEl = document.getElementById('marquee');
+        var popupEl = document.getElementById('group-popup');
+        var symbolOrder = [];
+        function readSymbolOrder() {
+            var layer = document.getElementById('boxes-layer');
+            try { symbolOrder = layer ? (JSON.parse(layer.dataset.symbols || '[]') || []) : []; }
+            catch (e) { symbolOrder = []; }
+        }
+        readSymbolOrder();
+
+        // ---- zoom: scale the whole stage (image + boxes + labels) like a PDF ----
+        var stageZoom = 1, ZOOM_MIN = 0.25, ZOOM_MAX = 5, ZOOM_STEP = 1.25;
+        var stageBaseWidth = 0;
+        function baseWidth() {
+            var vp = document.getElementById('stage-viewport');
+            var img = stageEl ? stageEl.querySelector('img') : null;
+            var avail = vp ? vp.clientWidth : 0;
+            var nat = (img && img.naturalWidth) ? img.naturalWidth : 0;
+            return (nat && (!avail || nat < avail)) ? nat : avail;
+        }
+        function measureBase() {
+            if (!stageEl) return 0;
+            stageEl.style.width = '';
+            stageEl.style.maxWidth = '';
+            stageBaseWidth = baseWidth();
+            return stageBaseWidth;
+        }
+        function applyZoom(z) {
+            stageZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+            try { localStorage.setItem('stage-zoom', String(stageZoom)); } catch (e) {}
+            if (stageEl) {
+                var base = stageBaseWidth || measureBase();
+                if (stageZoom === 1) {
+                    stageEl.style.width = '';
+                    stageEl.style.maxWidth = '';
+                } else {
+                    stageEl.style.maxWidth = 'none';
+                    stageEl.style.width = (base * stageZoom) + 'px';
+                }
+            }
+            var lvl = document.getElementById('zoom-level');
+            if (lvl) lvl.textContent = Math.round(stageZoom * 100) + '%';
+            updateBoxNums();
+        }
+        (function () {
+            var zin = document.getElementById('zoom-in');
+            var zout = document.getElementById('zoom-out');
+            var zreset = document.getElementById('zoom-reset');
+            if (zin) zin.addEventListener('click', function () { applyZoom(stageZoom * ZOOM_STEP); });
+            if (zout) zout.addEventListener('click', function () { applyZoom(stageZoom / ZOOM_STEP); });
+            if (zreset) zreset.addEventListener('click', function () { applyZoom(1); });
+            if (stageEl) {
+                stageEl.addEventListener('wheel', function (e) {
+                    if (!e.ctrlKey && !e.metaKey) return;
+                    e.preventDefault();
+                    applyZoom(stageZoom * (e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP));
+                }, { passive: false });
+            }
+        })();
+
+        // ---- box number: ~30% of the box's smaller side, shrunk to fit width ----
+        function updateBoxNums() {
+            document.querySelectorAll('.box, .member-outline').forEach(function (box) {
+                var num = box.querySelector('.box-num');
+                if (!num) return;
+                var w = box.offsetWidth, h = box.offsetHeight;
+                if (!w || !h) return;
+                var size = Math.max(6, Math.min(w, h) * 0.3);
+                num.style.fontSize = size + 'px';
+                var maxW = Math.max(1, w - 4), guard = 0;
+                while (num.scrollWidth > maxW && size > 5 && guard < 80) {
+                    size -= 1;
+                    num.style.fontSize = size + 'px';
+                    guard++;
+                }
+            });
+        }
+
+        // number each symbol box in reading order; group members each keep their label
+        function renumber() {
+            var included = {};
+            document.querySelectorAll('.box').forEach(function (box) {
+                if (!box.classList.contains('checked')) return;
+                (box.dataset.members || '').split(',').forEach(function (s) { if (s) included[s] = true; });
+            });
+            var num = {}, n = 0;
+            symbolOrder.forEach(function (sid) {
+                if (included[String(sid)]) { n += 1; num[sid] = n; }
+            });
+            function labelFor(members) {
+                return (members || '').split(',').map(function (s) {
+                    return num[s] !== undefined ? num[s] : null;
+                }).filter(function (v) { return v !== null; });
+            }
+            document.querySelectorAll('.box').forEach(function (box) {
+                var el = box.querySelector('.box-num');
+                if (!el) return;
+                if (box.classList.contains('group-box')) { el.textContent = ''; return; }
+                el.textContent = labelFor(box.dataset.members).join(', ');
+            });
+            document.querySelectorAll('.member-outline').forEach(function (m) {
+                var el = m.querySelector('.box-num');
+                if (!el) return;
+                var s = m.dataset.members;
+                el.textContent = (s && num[s] !== undefined) ? num[s] : '';
+            });
+            document.querySelectorAll('.unit-row, .group-card').forEach(function (el) {
+                var sid = el.querySelector('.sid');
+                if (!sid) return;
+                var idx = labelFor(el.dataset.members);
+                sid.textContent = idx.length ? '#' + idx.join(', #') : '';
+            });
+            updateBoxNums();
+        }
+
+        function refreshCount() {
+            var cbs = document.querySelectorAll('input[type="checkbox"][data-unit]');
+            var n = 0;
+            cbs.forEach(function (cb) { if (cb.checked) n++; });
+            ['sel-count', 'sel-count-2'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = n;
+            });
+        }
+
+        // tab counts reflect only included (checked) units
+        function updateTabCounts() {
+            var singles = 0, groups = 0;
+            document.querySelectorAll('input[type="checkbox"][data-unit]').forEach(function (cb) {
+                if (!cb.checked) return;
+                if (cb.dataset.unit.charAt(0) === 'g') groups++; else singles++;
+            });
+            var sEl = document.getElementById('single-count');
+            var gEl = document.getElementById('group-count');
+            if (sEl) sEl.textContent = singles;
+            if (gEl) gEl.textContent = groups;
+        }
+
+        // show a label row/card only while its unit is selected/checked
+        function syncRow(unitKey, checked) {
+            var row = document.querySelector('.unit-row[data-unit="' + unitKey + '"], .group-card[data-unit="' + unitKey + '"]');
+            if (row) row.classList.toggle('hidden', !checked);
+        }
+        function syncAllRows() {
+            document.querySelectorAll('input[type="checkbox"][data-unit]').forEach(function (cb) {
+                syncRow(cb.dataset.unit, cb.checked);
+            });
+        }
+
+        function setUnitChecked(unitKey, checked) {
+            var cb = document.getElementById('keep_' + unitKey);
+            if (!cb) return;
+            cb.checked = checked;
+            document.querySelectorAll('.box[data-unit="' + unitKey + '"]').forEach(function (b) {
+                b.classList.toggle('checked', checked);
+            });
+            syncRow(unitKey, checked);
+            refreshCount();
+            updateTabCounts();
+            renumber();
+            persistUnit('toggle', unitKey, null);
+        }
+
+        // fire-and-forget persistence so undo/redo can reload accurate state
+        function persistUnit(path, unitKey, label) {
+            if (!stageEl) return;
+            var body = new URLSearchParams();
+            body.append('unit_key', unitKey);
+            if (label !== null && label !== undefined) body.append('label', label);
+            fetch('/' + path + '/' + stageEl.dataset.imageId, { method: 'POST', body: body })
+                .catch(function () {});
+        }
+        function toggleUnit(unitKey) {
+            var cb = document.getElementById('keep_' + unitKey);
+            if (!cb) return;
+            setUnitChecked(unitKey, !cb.checked);
+        }
+
+        // click a box on the image to include/exclude its unit (delegated: survives soft refresh)
+        if (stageEl) {
+            stageEl.addEventListener('click', function (e) {
+                var box = e.target.closest('.box');
+                if (!box) return;
+                if (panMoved) return; // was a pan drag, not a click
+                toggleUnit(box.dataset.unit);
+            });
+        }
+
+        // highlight every box of a unit while editing its label input
+        function clearHighlight() {
+            document.querySelectorAll('.box.highlight').forEach(function (b) { b.classList.remove('highlight'); });
+            document.querySelectorAll('.unit-row.active, .group-card.active').forEach(function (r) { r.classList.remove('active'); });
+        }
+        function activateLabel(input) {
+            clearHighlight();
+            var key = input.dataset.unit;
+            document.querySelectorAll('.box[data-unit="' + key + '"]').forEach(function (b) {
+                b.classList.add('highlight');
+                b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            });
+            var row = input.closest('.unit-row, .group-card');
+            if (row) row.classList.add('active');
+        }
+        // delegated handlers on the (stable) right panel
+        function bindRightPanel(el) {
+            if (!el || el.dataset.bound) return;
+            el.dataset.bound = '1';
+            el.addEventListener('focusin', function (e) {
+                var input = e.target.closest('.label-input');
+                if (input) activateLabel(input);
+            });
+            el.addEventListener('mouseover', function (e) {
+                var input = e.target.closest('.label-input');
+                if (input && document.activeElement !== input) activateLabel(input);
+            });
+            el.addEventListener('focusout', function (e) {
+                if (e.target.closest('.label-input')) clearHighlight();
+            });
+            el.addEventListener('mouseout', function (e) {
+                var input = e.target.closest('.label-input');
+                if (input && document.activeElement !== input) clearHighlight();
+            });
+            el.addEventListener('change', function (e) {
+                var input = e.target.closest('.label-input');
+                if (input) persistUnit('rename', input.dataset.unit, input.value);
+            });
+            el.addEventListener('click', function (e) {
+                var addBtn = e.target.closest('.add-to-group-btn');
+                if (addBtn) { openMoveModal(addBtn.dataset.symbolId); return; }
+                var ungroupBtn = e.target.closest('.ungroup-btn');
+                if (ungroupBtn) { postForm('/ungroup/' + stageEl.dataset.imageId, { group_id: ungroupBtn.dataset.groupId }); return; }
+            });
+        }
+
+        // ---- interaction mode: Pan (move view) or Select (marquee group) ----
+        var mode = 'pan';
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.mode-btn').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.mode === m);
+            });
+            if (stageEl) stageEl.classList.toggle('select-mode', m === 'select');
+            if (marqueeEl) marqueeEl.style.display = 'none';
+            dragging = false;
+            panning = false;
+        }
+        document.querySelectorAll('.mode-btn').forEach(function (b) {
+            b.addEventListener('click', function () { setMode(b.dataset.mode); localStorage.setItem('stage-mode', b.dataset.mode); });
+        });
+
+        // ---- pan (drag to move the view) ----
+        var panning = false, panStartX = 0, panStartY = 0, panScrollLeft = 0, panScrollTop = 0, panMoved = false;
+
+        // ---- drag a rubber-band rectangle to select several boxes (Select mode) ----
+        var dragging = false, dragStartX = 0, dragStartY = 0;
+        if (stageEl) {
+            stageEl.addEventListener('mousedown', function (e) {
+                if (e.button !== 0) return;
+                if (mode === 'pan') {
+                    var vp = document.getElementById('stage-viewport');
+                    panning = true;
+                    panMoved = false;
+                    panStartX = e.clientX;
+                    panStartY = e.clientY;
+                    panScrollLeft = vp ? vp.scrollLeft : 0;
+                    panScrollTop = vp ? vp.scrollTop : 0;
+                    stageEl.classList.add('panning');
+                    popupEl.style.display = 'none';
+                    e.preventDefault();
+                    return;
+                }
+                if (e.target.closest('.box')) return;
+                var rect = stageEl.getBoundingClientRect();
+                dragStartX = e.clientX - rect.left;
+                dragStartY = e.clientY - rect.top;
+                dragging = true;
+                marqueeEl.style.display = 'block';
+                marqueeEl.style.left = dragStartX + 'px';
+                marqueeEl.style.top = dragStartY + 'px';
+                marqueeEl.style.width = '0px';
+                marqueeEl.style.height = '0px';
+                popupEl.style.display = 'none';
+                e.preventDefault();
+            });
+            window.addEventListener('mousemove', function (e) {
+                if (panning) {
+                    var vp = document.getElementById('stage-viewport');
+                    var dx = e.clientX - panStartX, dy = e.clientY - panStartY;
+                    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) panMoved = true;
+                    if (vp) {
+                        vp.scrollLeft = panScrollLeft - dx;
+                        vp.scrollTop = panScrollTop - dy;
+                    }
+                    return;
+                }
+                if (!dragging) return;
+                var rect = stageEl.getBoundingClientRect();
+                var cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+                marqueeEl.style.left = Math.min(dragStartX, cx) + 'px';
+                marqueeEl.style.top = Math.min(dragStartY, cy) + 'px';
+                marqueeEl.style.width = Math.abs(cx - dragStartX) + 'px';
+                marqueeEl.style.height = Math.abs(cy - dragStartY) + 'px';
+            });
+            window.addEventListener('mouseup', function (e) {
+                if (panning) {
+                    panning = false;
+                    stageEl.classList.remove('panning');
+                    return;
+                }
+                if (!dragging) return;
+                dragging = false;
+                var mrect = marqueeEl.getBoundingClientRect();
+                marqueeEl.style.display = 'none';
+                if (mrect.width < 6 && mrect.height < 6) return;
+                var sids = [], units = [];
+                document.querySelectorAll('.box').forEach(function (b) {
+                    var r = b.getBoundingClientRect();
+                    var hit = !(r.right < mrect.left || r.left > mrect.right ||
+                                r.bottom < mrect.top || r.top > mrect.bottom);
+                    if (!hit) return;
+                    if (b.dataset.unit && units.indexOf(b.dataset.unit) === -1) units.push(b.dataset.unit);
+                    (b.dataset.members || '').split(',').forEach(function (sid) {
+                        if (sid && sids.indexOf(sid) === -1) sids.push(sid);
+                    });
+                });
+                showMarqueePopup(mrect, sids, units);
+            });
+        }
+
+        function showMarqueePopup(mrect, sids, units) {
+            popupEl.innerHTML = '';
+            var newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.className = 'btn';
+            newBtn.textContent = 'New Symbol';
+            newBtn.addEventListener('click', function () { submitNewSymbol(mrect); });
+            popupEl.appendChild(newBtn);
+
+            if (sids.length >= 2) {
+                var combineBtn = document.createElement('button');
+                combineBtn.type = 'button';
+                combineBtn.className = 'btn';
+                combineBtn.textContent = 'Combine as one symbol (' + sids.length + ')';
+                combineBtn.addEventListener('click', function () { submitCombine(sids); });
+                popupEl.appendChild(combineBtn);
+
+                var groupBtn = document.createElement('button');
+                groupBtn.type = 'button';
+                groupBtn.className = 'btn';
+                groupBtn.textContent = 'New Group (' + sids.length + ')';
+                groupBtn.addEventListener('click', function () { submitGroup(sids); });
+                popupEl.appendChild(groupBtn);
+            }
+
+            if (units.length) {
+                var exclBtn = document.createElement('button');
+                exclBtn.type = 'button';
+                exclBtn.className = 'btn';
+                exclBtn.style.background = 'var(--danger)';
+                exclBtn.textContent = 'Exclude (' + units.length + ')';
+                exclBtn.addEventListener('click', function () { submitExclude(units); });
+                popupEl.appendChild(exclBtn);
+            }
+
+            var cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'btn';
+            cancelBtn.style.background = '#64748b';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.addEventListener('click', function () { popupEl.style.display = 'none'; });
+            popupEl.appendChild(cancelBtn);
+
+            // place just below the dragged rectangle, clamped to the viewport
+            popupEl.style.left = '0px';
+            popupEl.style.top = '0px';
+            popupEl.style.display = 'flex';
+            var pw = popupEl.offsetWidth;
+            var ph = popupEl.offsetHeight;
+            var px = mrect.left;
+            var py = mrect.bottom + 6;
+            if (px + pw > window.innerWidth - 8) px = window.innerWidth - pw - 8;
+            if (px < 8) px = 8;
+            if (py + ph > window.innerHeight - 8) py = mrect.top - ph - 6;
+            if (py < 8) py = 8;
+            popupEl.style.left = px + 'px';
+            popupEl.style.top = py + 'px';
+        }
+
+        // turn the dragged rectangle into a new symbol box (image pixel coords)
+        function submitNewSymbol(mrect) {
+            var imgEl = stageEl.querySelector('img');
+            if (!imgEl) return;
+            var ir = imgEl.getBoundingClientRect();
+            var imgW = parseFloat(stageEl.dataset.imgW) || 0;
+            var imgH = parseFloat(stageEl.dataset.imgH) || 0;
+            if (!imgW || !imgH || !ir.width || !ir.height) return;
+            var sx = imgW / ir.width, sy = imgH / ir.height;
+            var x = Math.round((mrect.left - ir.left) * sx);
+            var y = Math.round((mrect.top - ir.top) * sy);
+            var w = Math.round(mrect.width * sx);
+            var h = Math.round(mrect.height * sy);
+            x = Math.max(0, Math.min(x, imgW - 1));
+            y = Math.max(0, Math.min(y, imgH - 1));
+            w = Math.max(1, Math.min(w, imgW - x));
+            h = Math.max(1, Math.min(h, imgH - y));
+            postForm('/symbol/' + stageEl.dataset.imageId, { x: x, y: y, w: w, h: h });
+        }
+
+        // swap just the dynamic parts (boxes + labels panel + move modal) from fresh HTML
+        function applyReview(html) {
+            var doc = new DOMParser().parseFromString(html, 'text/html');
+            var layer = document.getElementById('boxes-layer');
+            var newLayer = doc.getElementById('boxes-layer');
+            if (layer && newLayer) {
+                layer.innerHTML = newLayer.innerHTML;
+                if (newLayer.dataset.symbols !== undefined) layer.dataset.symbols = newLayer.dataset.symbols;
+            }
+            readSymbolOrder();
+
+            var rp = document.querySelector('.right-panel');
+            var newRp = doc.querySelector('.right-panel');
+            if (rp && newRp) {
+                rp.innerHTML = newRp.innerHTML;
+            } else if (rp && !newRp) {
+                rp.remove();
+            } else if (!rp && newRp) {
+                var main = document.querySelector('.main-panel');
+                if (main) main.after(newRp);
+            }
+            var rpNow = document.querySelector('.right-panel');
+            if (rpNow) bindRightPanel(rpNow);
+
+            var mm = document.getElementById('move-modal');
+            var newMm = doc.getElementById('move-modal');
+            if (mm && newMm) mm.innerHTML = newMm.innerHTML;
+
+            syncAllRows();
+            refreshCount();
+            updateTabCounts();
+            renumber();
+            updateBoxNums();
+            applyZoom(stageZoom);
+        }
+
+        // POST then refresh the dynamic parts in place (no page reload)
+        function postForm(action, fields) {
+            if (popupEl) popupEl.style.display = 'none';
+            var body = new URLSearchParams();
+            Object.keys(fields).forEach(function (name) { body.append(name, fields[name]); });
+            fetch(action, { method: 'POST', body: body })
+                .then(function (r) { return r.text(); })
+                .then(applyReview)
+                .catch(function () {});
+        }
+        function submitGroup(sids) {
+            postForm('/group/' + stageEl.dataset.imageId, { sids: sids.join(',') });
+        }
+        function submitCombine(sids) {
+            postForm('/combine/' + stageEl.dataset.imageId, { sids: sids.join(',') });
+        }
+        function submitExclude(units) {
+            postForm('/exclude/' + stageEl.dataset.imageId, { units: units.join(',') });
+        }
+
+        document.addEventListener('mousedown', function (e) {
+            if (popupEl && !popupEl.contains(e.target)) popupEl.style.display = 'none';
+        });
+
+        // ---- tabs (Single / Grouped) ----
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach(function (t) {
+                t.classList.toggle('active', t.dataset.tab === name);
+            });
+            document.querySelectorAll('.tab-panel').forEach(function (p) {
+                p.classList.toggle('active', p.id === 'tab-' + name);
+            });
+        }
+
+        // ---- theme toggle ----
+        (function () {
+            var btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        })();
+
+        // ---- undo / redo ----
+        function historyAction(path) {
+            if (!stageEl) return;
+            fetch('/' + path + '/' + stageEl.dataset.imageId, { method: 'POST' })
+                .then(function (r) { return r.text(); })
+                .then(applyReview)
+                .catch(function () {});
+        }
+        (function () {
+            var u = document.getElementById('undo-btn');
+            var r = document.getElementById('redo-btn');
+            if (u) u.addEventListener('click', function () { historyAction('undo'); });
+            if (r) r.addEventListener('click', function () { historyAction('redo'); });
+            document.addEventListener('keydown', function (e) {
+                var tag = (e.target.tagName || '').toLowerCase();
+                if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+                if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 'z') return;
+                e.preventDefault();
+                historyAction(e.shiftKey ? 'redo' : 'undo');
+            });
+        })();
+
+        // ---- analyze confirmation modal (re-analyzing clears history) ----
+        (function () {
+            var form = document.getElementById('analyze-form');
+            var modal = document.getElementById('confirm-modal');
+            if (!form || !modal) return;
+            form.addEventListener('submit', function (e) {
+                if (form.dataset.hasBoxes !== '1') return; // nothing to lose: analyze straight away
+                e.preventDefault();
+                modal.classList.add('open');
+            });
+            var cancel = document.getElementById('modal-cancel');
+            var confirmBtn = document.getElementById('modal-confirm');
+            if (cancel) cancel.addEventListener('click', function () { modal.classList.remove('open'); });
+            if (confirmBtn) confirmBtn.addEventListener('click', function () {
+                modal.classList.remove('open');
+                form.submit();
+            });
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) modal.classList.remove('open');
+            });
+        })();
+
+        // ---- add a single symbol to an existing group ----
+        var moveState = { symbolId: null, groupId: null };
+        function openMoveModal(symbolId) {
+            var modal = document.getElementById('move-modal');
+            if (!modal) return;
+            moveState.symbolId = symbolId;
+            moveState.groupId = null;
+            modal.querySelectorAll('.move-group-option').forEach(function (o) { o.classList.remove('selected'); });
+            var confirmBtn = document.getElementById('move-confirm');
+            if (confirmBtn) confirmBtn.disabled = true;
+            modal.classList.add('open');
+        }
+        (function () {
+            var modal = document.getElementById('move-modal');
+            if (!modal || !stageEl) return;
+            modal.addEventListener('click', function (e) {
+                var opt = e.target.closest('.move-group-option');
+                if (opt) {
+                    moveState.groupId = opt.dataset.groupId;
+                    modal.querySelectorAll('.move-group-option').forEach(function (o) { o.classList.toggle('selected', o === opt); });
+                    var confirmBtn = document.getElementById('move-confirm');
+                    if (confirmBtn) confirmBtn.disabled = false;
+                    clearHighlight();
+                    var box = document.querySelector('.box[data-unit="' + opt.dataset.unit + '"]');
+                    if (box) {
+                        box.classList.add('highlight');
+                        box.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                    }
+                    return;
+                }
+                if (e.target.closest('#move-confirm')) {
+                    if (!moveState.symbolId || !moveState.groupId) return;
+                    modal.classList.remove('open');
+                    postForm('/group/add/' + stageEl.dataset.imageId, {
+                        symbol_id: moveState.symbolId, group_id: moveState.groupId
+                    });
+                    return;
+                }
+                if (e.target.closest('#move-cancel') || e.target === modal) {
+                    modal.classList.remove('open');
+                    clearHighlight();
+                }
+            });
+        })();
+
+        // ---- toast messages (e.g. after export) ----
+        (function () {
+            var toast = document.getElementById('toast');
+            if (!toast) return;
+            var params = new URLSearchParams(window.location.search);
+            var msg = params.get('toast');
+            if (!msg) return;
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(function () { toast.classList.remove('show'); }, 3200);
+            params.delete('toast');
+            var qs = params.toString();
+            history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+        })();
+
+        // ---- rename image ----
+        (function () {
+            var modal = document.getElementById('rename-modal');
+            if (!modal) return;
+            var form = document.getElementById('rename-image-form');
+            var input = document.getElementById('rename-image-input');
+            var extEl = document.getElementById('rename-image-ext');
+            var nextField = form.querySelector('input[name="next_url"]');
+            var cancel = document.getElementById('rename-image-cancel');
+            document.querySelectorAll('.rename-image-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    form.action = '/image/rename/' + btn.dataset.imageId;
+                    var fn = btn.dataset.filename || '';
+                    var dot = fn.lastIndexOf('.');
+                    if (dot > 0) {
+                        input.value = fn.slice(0, dot);
+                        extEl.textContent = fn.slice(dot);
+                    } else {
+                        input.value = fn;
+                        extEl.textContent = '';
+                    }
+                    nextField.value = window.location.pathname + window.location.search;
+                    modal.classList.add('open');
+                    input.focus();
+                    input.select();
+                });
+            });
+            if (cancel) cancel.addEventListener('click', function () { modal.classList.remove('open'); });
+            modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('open'); });
+        })();
+
+        // ---- collapsible left sidebar ----
+        (function () {
+            var sidebar = document.querySelector('.sidebar');
+            var btn = document.getElementById('sidebar-toggle');
+            if (!sidebar || !btn) return;
+            if (localStorage.getItem('sidebar-collapsed') === '1') sidebar.classList.add('collapsed');
+            btn.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+            });
+        })();
+
+        bindRightPanel(document.querySelector('.right-panel'));
+        syncAllRows();
+        refreshCount();
+        updateTabCounts();
+        setMode(localStorage.getItem('stage-mode') || 'pan');
+        renumber();
+        updateBoxNums();
+        function restoreZoom() {
+            var z = parseFloat(localStorage.getItem('stage-zoom'));
+            if (!isNaN(z)) applyZoom(z);
+        }
+        window.addEventListener('load', function () { measureBase(); updateBoxNums(); restoreZoom(); });
+        if (stageEl) {
+            var stageImg = stageEl.querySelector('img');
+            if (stageImg) {
+                stageImg.addEventListener('load', function () { measureBase(); updateBoxNums(); restoreZoom(); });
+                if (stageImg.complete) restoreZoom();
+            }
+        }
+        window.addEventListener('resize', function () {
+            measureBase();
+            if (stageEl && stageZoom !== 1) {
+                stageEl.style.maxWidth = 'none';
+                stageEl.style.width = (stageBaseWidth * stageZoom) + 'px';
+            }
+            updateBoxNums();
+        });
+    </script>
+</body>
+</html>
